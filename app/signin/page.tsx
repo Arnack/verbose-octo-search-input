@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState } from "react";
 import {
@@ -18,15 +18,13 @@ const Login: React.FC = () => {
   const router = useRouter();
 
   const handleFillDefault = () => {
-    setUsername("applicant@icebrg.uk");
-    setPassword("assignment_task375");
+    setUsername(process.env.NEXT_PUBLIC_DEFAULT_EMAIL as string);
+    setPassword(process.env.NEXT_PUBLIC_DEFAULT_PASSWORD as string);
   };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  const isFormValid = username.trim() !== "" && password.trim() !== "";
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -50,6 +48,11 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const isFormValid = username.trim() !== "" && password.trim() !== "";
+  const displayDefauldDataButton =
+    process.env.NEXT_PUBLIC_DEFAULT_EMAIL &&
+    process.env.NEXT_PUBLIC_DEFAULT_PASSWORD;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
@@ -102,13 +105,15 @@ const Login: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center justify-between">
-            <button
-              className="bg-gray-800 hover:bg-gray-700 border border-gray-500 text-gray-300 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="button"
-              onClick={handleFillDefault}
-            >
-              Use Default Data
-            </button>
+            {displayDefauldDataButton && (
+              <button
+                className="bg-gray-800 hover:bg-gray-700 border border-gray-500 text-gray-300 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="button"
+                onClick={handleFillDefault}
+              >
+                Use Default Data
+              </button>
+            )}
             <button
               className={`bg-green-500 text-gray-100 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
                 !isFormValid || loading
