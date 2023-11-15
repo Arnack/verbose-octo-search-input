@@ -1,5 +1,5 @@
 import { LOGIN_ENDPOINT } from "@/app/service/constants";
-import type { NextAuthOptions, Session } from 'next-auth'
+import type { NextAuthOptions } from 'next-auth'
 import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -47,6 +47,7 @@ export const options: NextAuthOptions = {
       return session;
     },
   },
+  secret: process.env.SECRET,
   session: {
     strategy: "jwt",
   },
