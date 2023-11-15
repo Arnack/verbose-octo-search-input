@@ -16,7 +16,7 @@ export default function Home() {
 
   return (
     <div>
-      <Autocomplete accessToken={accessToken} />
+      {accessToken && <Autocomplete accessToken={accessToken} />}
     </div>
   );
 }
