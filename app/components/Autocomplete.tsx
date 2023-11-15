@@ -1,4 +1,4 @@
-import React, { useState, useEffect, KeyboardEvent, useRef } from "react";
+import React, { useState, useEffect, KeyboardEvent, FC } from "react";
 import { useSession } from "next-auth/react";
 import { Session } from "next-auth";
 import { getUniqueNames } from "../service/helpers";
@@ -7,16 +7,15 @@ import { useQuery } from "react-query";
 import { fetchSuggestions } from "../service/api";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useDebounce } from "../hooks/useDebounce";
+import SuggestionItem from "./SuggestionItem";
 
-type TSession = Session & {
-  accessToken: string;
-};
+interface AutocompleteProps {
+  accessToken:string;
+}
 
-const Autocomplete = () => {
+const Autocomplete: FC<AutocompleteProps> = ({ accessToken }) => {
   const [input, setInput] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
-  const { data: session } = useSession() as { data: TSession | null };
-  const accessToken: string = session?.accessToken || "";
   const debouncedInput = useDebounce(input, 500);
 
   const { isLoading, isError, data, error } = useQuery(
@@ -24,6 +23,10 @@ const Autocomplete = () => {
     () => fetchSuggestions(debouncedInput, accessToken),
     { enabled: !!debouncedInput }
   );
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    setInput(suggestion);
+  };
 
   useEffect(() => {
     if (isError && error instanceof Error) {
@@ -47,26 +50,6 @@ const Autocomplete = () => {
     }
   };
 
-  const renderSuggestion = (suggestion: string) => {
-    if (!input) return suggestion;
-    const startIndex = suggestion.toLowerCase().indexOf(input.toLowerCase());
-    if (startIndex === -1) return suggestion;
-
-    const suggestionStart = suggestion.slice(0, startIndex);
-    const suggestionUnhighlited = suggestion.slice(
-      startIndex,
-      startIndex + input.length
-    );
-    const suggestionEnd = suggestion.slice(startIndex + input.length);
-    return (
-      <>
-        <strong>{suggestionStart}</strong>
-        {suggestionUnhighlited}
-        <strong>{suggestionEnd}</strong>
-      </>
-    );
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-10 bg-gray-900">
       <div className="w-full max-w-md relative">
@@ -85,15 +68,13 @@ const Autocomplete = () => {
         )}
         <ul className="hidden absolute z-10 w-full mt-1 max-h-60 overflow-auto rounded-md bg-gray-700 hover:block peer-focus:block ">
           {suggestions.map((suggestion, index) => (
-            <li
-              key={index}
-              className={`px-4 py-2 hover:bg-gray-600 cursor-pointer ${
-                index === highlightedIndex ? "bg-gray-600" : ""
-              }`}
-              onClick={() => setInput(suggestion)}
-            >
-              {renderSuggestion(suggestion)}
-            </li>
+            <SuggestionItem
+              key={suggestion}
+              suggestion={suggestion}
+              query={input}
+              isHighlighted={index === highlightedIndex}
+              onSelectSuggestion={handleSelectSuggestion}
+            />
           ))}
         </ul>
       </div>

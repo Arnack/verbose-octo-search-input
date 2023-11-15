@@ -1,6 +1,11 @@
-import axios from "axios";
-import type { NextAuthOptions } from 'next-auth'
+import { LOGIN_ENDPOINT } from "@/app/service/constants";
+import type { NextAuthOptions, Session } from 'next-auth'
+import { AdapterUser } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
+
+interface CustomUser extends AdapterUser {
+  accessToken: string;
+}
 
 export const options: NextAuthOptions = {
   providers: [
@@ -11,28 +16,34 @@ export const options: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
-        const response = await axios.post("https://icebrg.mehanik.me/api/login", {
-          password: credentials?.password,
-          email: credentials?.email,
+        const response = await fetch(LOGIN_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            password: credentials?.password,
+            email: credentials?.email,
+          })
         });
 
-        if (response.data.access_token) {
-          return {...response.data, accessToken: response.data.access_token};
-        }
+        const data = await response.json();
 
-        return null;
+        return data.access_token ?
+          {...data, accessToken: data.access_token} :
+          null;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken;
+        token.accessToken = (user as CustomUser).accessToken;
       }
       return token;
     },
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
+      session.accessToken = token.accessToken as string;
       return session;
     },
   },

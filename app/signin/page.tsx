@@ -26,30 +26,30 @@ const Login: React.FC = () => {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const isFormValid = username.trim() !== "" && password.trim() !== "";
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    signIn("credentials", {
-      email: username,
-      password,
-      redirect: false,
-    })
-      .then((response) => {
-        if (response?.ok) {
-          router.push("/");
-        } else {
-          toast.error("Login failed. Please check your credentials.");
-        }
-      })
-      .catch((error) => {
-        toast.error(error.message || "An unexpected error occurred");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 
-  const isFormValid = username.trim() !== "" && password.trim() !== "";
+    try {
+      const response = await signIn("credentials", {
+        email: username,
+        password,
+        redirect: false,
+      });
+
+      if (response?.ok) {
+        router.push("/");
+      } else {
+        toast.error("Login failed. Please check your credentials.");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">

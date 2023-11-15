@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import Autocomplete from "./components/Autocomplete";
 import { useSession } from "next-auth/react";
@@ -12,9 +12,11 @@ export default function Home() {
     },
   });
 
+  const accessToken: string = session?.accessToken || "";
+
   return (
     <div>
-      <Autocomplete />
+      <Autocomplete accessToken={accessToken} />
     </div>
   );
 }

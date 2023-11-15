@@ -1,6 +1,7 @@
+import { SEARCH_ENDPOINT } from "./constants";
 
 export const fetchSuggestions = async (input: string, accessToken: string) => {
-    const response = await fetch(`https://icebrg.mehanik.me/api/search`, {
+    const response = await fetch(SEARCH_ENDPOINT, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
