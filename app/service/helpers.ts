@@ -3,13 +3,13 @@ type NamedEntity = {
   [key: string]: any;
 };
 
-type Data = {
+export type SearchData = {
   continents: NamedEntity[] | null;
   countries: NamedEntity[] | null;
   languages: NamedEntity[] | null;
 };
 
-export const getUniqueNames = (data: Data): string[] => {
+export const getUniqueNames = (data: SearchData): string[] => {
   const names = new Set<string>();
 
   const addNames = (entities: NamedEntity[] | null) => {
@@ -22,9 +22,9 @@ export const getUniqueNames = (data: Data): string[] => {
     }
   };
 
-  addNames(data.continents);
-  addNames(data.countries);
-  addNames(data.languages);
+  addNames(data?.continents);
+  addNames(data?.countries);
+  addNames(data?.languages);
 
   return Array.from(names);
 }
