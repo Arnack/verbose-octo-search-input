@@ -1,15 +1,20 @@
 "use client";
 
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  ArrowPathIcon,
+} from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handleFillDefault = () => {
@@ -23,24 +28,25 @@ const Login: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    setLoading(true);
     signIn("credentials", {
       email: username,
       password,
       redirect: false,
     })
-    .then((response) => {
-      if (response?.ok) {
-        toast.success(`Welcome User!`, {
-            autoClose: 1000,
-        });
-        router.push("/");
-      } else {
-        toast.error("Login failed. Please check your credentials.");
-      }
-    })
-    .catch((error) => {
-      toast.error(error.message || "An unexpected error occurred");
-    });
+      .then((response) => {
+        if (response?.ok) {
+          router.push("/");
+        } else {
+          toast.error("Login failed. Please check your credentials.");
+        }
+      })
+      .catch((error) => {
+        toast.error(error.message || "An unexpected error occurred");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const isFormValid = username.trim() !== "" && password.trim() !== "";
@@ -105,14 +111,18 @@ const Login: React.FC = () => {
             </button>
             <button
               className={`bg-green-500 text-gray-100 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
-                !isFormValid
+                !isFormValid || loading
                   ? "opacity-50 cursor-not-allowed"
                   : "hover:bg-green-700"
               }`}
               type="submit"
-              disabled={!isFormValid}
+              disabled={loading || !isFormValid}
             >
-              Sign In
+              {loading ? (
+                <ArrowPathIcon className="h-5 w-5 text-gray-100 animate-spin" />
+              ) : (
+                "Sign In"
+              )}
             </button>
           </div>
         </form>
