@@ -13,6 +13,8 @@ export default function Home() {
   });
 
   const accessToken: string = session?.accessToken || "";
+console.log('accessToken >>>>', accessToken);
+console.log('session >>>>', session);
 
   return (
     <div>

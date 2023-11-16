@@ -10,7 +10,7 @@ import { useDebounce } from "../hooks/useDebounce";
 import SuggestionItem from "./SuggestionItem";
 
 interface AutocompleteProps {
-  accessToken:string;
+  accessToken: string;
 }
 
 const Autocomplete: FC<AutocompleteProps> = ({ accessToken }) => {
@@ -50,6 +50,8 @@ const Autocomplete: FC<AutocompleteProps> = ({ accessToken }) => {
     }
   };
 
+  const shouldRenderSuggestions = input.trim() !== "" && suggestions.length > 1 && suggestions[0] !== input;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-10 bg-gray-900">
       <div className="w-full max-w-md relative">
@@ -66,17 +68,19 @@ const Autocomplete: FC<AutocompleteProps> = ({ accessToken }) => {
             <ArrowPathIcon className="h-5 w-5 animate-spin" />
           </div>
         )}
-        <ul className="hidden absolute z-10 w-full mt-1 max-h-60 overflow-auto rounded-md bg-gray-700 hover:block peer-focus:block ">
-          {suggestions.map((suggestion, index) => (
-            <SuggestionItem
-              key={suggestion}
-              suggestion={suggestion}
-              query={input}
-              isHighlighted={index === highlightedIndex}
-              onSelectSuggestion={handleSelectSuggestion}
-            />
-          ))}
-        </ul>
+        {shouldRenderSuggestions && (
+          <ul className="hidden absolute z-10 w-full mt-1 max-h-60 overflow-auto rounded-md bg-gray-700 hover:block peer-focus:block ">
+            {suggestions.map((suggestion, index) => (
+              <SuggestionItem
+                key={suggestion}
+                suggestion={suggestion}
+                query={input}
+                isHighlighted={index === highlightedIndex}
+                onSelectSuggestion={handleSelectSuggestion}
+              />
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
