@@ -50,7 +50,8 @@ const Autocomplete: FC<AutocompleteProps> = ({ accessToken }) => {
     }
   };
 
-  const shouldRenderSuggestions = input.trim() !== "" && suggestions.length > 1 && suggestions[0] !== input;
+  const shouldRenderSuggestions = input.trim() !== "" && suggestions.length > 1 ||
+    suggestions.length === 1 && suggestions[0].length !== input.length;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-10 bg-gray-900">

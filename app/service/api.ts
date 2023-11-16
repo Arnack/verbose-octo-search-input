@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "./axios.config";
 import { SEARCH_ENDPOINT } from "./constants";
 
 export const fetchSuggestions = async (input: string, accessToken: string) => {

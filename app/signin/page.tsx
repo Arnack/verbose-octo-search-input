@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -8,18 +8,30 @@ import {
 } from "@heroicons/react/24/outline";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { DEFAULT_EMAIL, DEFAULT_PASSWORD } from "../service/constants";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const hasShownToast = useRef(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const errorCode = searchParams.get("errorcode");
+
+  useEffect(() => {
+    if (errorCode === "401" && !hasShownToast.current) {
+      toast.error("Session expired. Please log in again.");
+      hasShownToast.current = true;
+    }
+  }, [errorCode]);
 
   const handleFillDefault = () => {
-    setUsername(process.env.NEXT_PUBLIC_DEFAULT_EMAIL as string);
-    setPassword(process.env.NEXT_PUBLIC_DEFAULT_PASSWORD as string);
+    setUsername(DEFAULT_EMAIL?.toString() || "");
+    setPassword(DEFAULT_PASSWORD?.toString() || "");
   };
 
   const togglePasswordVisibility = () => {
@@ -50,9 +62,7 @@ const Login: React.FC = () => {
   };
 
   const isFormValid = username.trim() !== "" && password.trim() !== "";
-  const displayDefauldDataButton =
-    process.env.NEXT_PUBLIC_DEFAULT_EMAIL &&
-    process.env.NEXT_PUBLIC_DEFAULT_PASSWORD;
+  const displayDefauldDataButton = DEFAULT_EMAIL && DEFAULT_PASSWORD;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
