@@ -21,8 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <ToastContainer />
         <AuthProvider>
-          <ToastContainer />
           <DataProvider>{children}</DataProvider>
         </AuthProvider>
       </body>
